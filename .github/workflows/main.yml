@@ -1,4 +1,3 @@
-
 name: Aktos CI/CD
 
 on:
@@ -11,28 +10,12 @@ jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-latest
+    container:
+      image: docker:latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-
-    - name: Check if Docker is installed
-      id: docker_check
-      run: |
-        if command -v docker &> /dev/null; then
-          echo "Docker is already installed"
-          echo "docker_installed=true" >> $GITHUB_ENV
-        else
-          echo "docker_installed=false" >> $GITHUB_ENV
-        fi
-
-    - name: Install Docker if not installed
-      if: env.docker_installed == 'false'
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y docker.io
-        sudo systemctl start docker
-        sudo systemctl enable docker
 
     - name: Install pre-commit
       run: pip install pre-commit
@@ -48,6 +31,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/master'
+    container:
+      image: docker:latest
 
     steps:
     - name: Checkout repository
