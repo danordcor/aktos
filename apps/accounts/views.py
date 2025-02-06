@@ -6,10 +6,10 @@ from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.http import JsonResponse
-from .utils import process_csv_data
+from apps.accounts.utils import CSVProcessor
 
-from .models import Account
-from .serializers import AccountSerializer
+from apps.accounts.models import Account
+from apps.accounts.serializers import AccountSerializer
 
 class AccountPagination(PageNumberPagination):
     page_size = 10
@@ -53,4 +53,4 @@ class ImportCSVView(APIView):
         if not file:
             return JsonResponse({"error": "No file provided"}, status=400)
 
-        return process_csv_data(file)
+        return CSVProcessor(file).process()

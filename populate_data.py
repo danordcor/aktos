@@ -4,7 +4,7 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 
-from apps.accounts.utils import process_csv_data
+from apps.accounts.utils import CSVProcessor
 
 def import_consumers_balance():
     file_path = os.path.join(os.getcwd(), "consumers_balances.csv")
@@ -15,7 +15,7 @@ def import_consumers_balance():
 
     try:
         with open(file_path, "rb") as file:
-            response = process_csv_data(file)
+            response = CSVProcessor(file).process()
             print(response.content.decode("utf-8"))
 
     except Exception as e:
