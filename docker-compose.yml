@@ -1,20 +1,28 @@
 version: '3'
+
 services:
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8080
+    command: python manage.py runserver 0.0.0.0:${PORT:-8080}
     volumes:
       - .:/app
     ports:
       - "8080:8080"
     depends_on:
       - db
-    env_file: .env
+    env_file:
+      - .env  # Load all environment variables for Django
+
   db:
     image: postgres:13
-    volumes:
-      - ./data:/var/lib/postgresql/dat
+    restart: always
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}  # Dynamically map DB_PASSWORD to POSTGRES_PASSWORD
+    env_file:
+      - .env  # Load database credentials from .env
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    ports:
+      - "5432"
