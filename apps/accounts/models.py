@@ -19,9 +19,9 @@ class Consumer(models.Model):
 
 class Account(models.Model):
     STATUS_CHOICES = [
-        ('inactive', 'Inactive'),
-        ('in_collection', 'In Collection'),
-        ('paid_in_full', 'Paid in Full'),
+        ("inactive", "Inactive"),
+        ("in_collection", "In Collection"),
+        ("paid_in_full", "Paid in Full"),
     ]
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
