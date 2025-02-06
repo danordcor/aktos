@@ -1,23 +1,26 @@
-import csv
-import io
-
 from rest_framework import generics
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.filters import OrderingFilter
-from rest_framework.views import APIView
-
+from rest_framework.pagination import PageNumberPagination
 from django.db.models import Q
-from django.db import transaction
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
 from django.http import JsonResponse
-from .models import Account, Client, Consumer
+from .utils import process_csv_data
+
+from .models import Account
 from .serializers import AccountSerializer
 
+class AccountPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
 class AccountListView(generics.ListAPIView):
     serializer_class = AccountSerializer
     filter_backends = [OrderingFilter]
     ordering_fields = ["balance", "status"]
+    pagination_class = AccountPagination
 
     def get_queryset(self):
         queryset = Account.objects.all()
@@ -41,7 +44,6 @@ class AccountListView(generics.ListAPIView):
 
         return queryset
 
-
 class ImportCSVView(APIView):
     parser_classes = (MultiPartParser, FormParser)
 
@@ -51,60 +53,4 @@ class ImportCSVView(APIView):
         if not file:
             return JsonResponse({"error": "No file provided"}, status=400)
 
-        if not file.name.endswith(".csv"):
-            return JsonResponse(
-                {"error": "Invalid file format. Please upload a CSV file."}, status=400
-            )
-
-        try:
-            decoded_file = file.read().decode("utf-8")
-            csv_reader = csv.reader(io.StringIO(decoded_file))
-            headers = next(csv_reader, None)
-
-            expected_headers = [
-                "client reference no",
-                "balance",
-                "status",
-                "consumer name",
-                "consumer address",
-                "ssn",
-            ]
-            if headers != expected_headers:
-                return JsonResponse({"error": "Invalid CSV structure."}, status=400)
-
-            client, _ = Client.objects.get_or_create(name="Default Client")
-
-            with transaction.atomic():
-                for row in csv_reader:
-                    if len(row) != 6:
-                        return JsonResponse({"error": "Malformed CSV row."}, status=400)
-
-                    (
-                        client_reference_no,
-                        balance,
-                        status,
-                        consumer_name,
-                        consumer_address,
-                        ssn,
-                    ) = row
-
-                    consumer, _ = Consumer.objects.get_or_create(
-                        name=consumer_name.strip(),
-                        address=consumer_address.strip(),
-                        ssn=ssn.strip(),
-                    )
-
-                    account, created = Account.objects.get_or_create(
-                        client=client,
-                        client_reference_no=client_reference_no.strip(),
-                        defaults={
-                            "balance": balance,
-                            "status": status.lower(),
-                        },
-                    )
-                    account.consumers.add(consumer)
-
-            return JsonResponse({"message": "CSV imported successfully"}, status=201)
-
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
+        return process_csv_data(file)
