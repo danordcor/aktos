@@ -12,47 +12,73 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pre-commit
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pre-commit
 
-    - name: Run pre-commit hooks
-      run: pre-commit run --all-files
+      - name: Run pre-commit hooks
+        run: pre-commit run --all-files
 
-    - name: Run tests
-      run: docker-compose -f docker-compose.yml run web python manage.py test
+      - name: Run tests
+        run: docker-compose -f docker-compose.yml run web python manage.py test
 
   deploy:
     name: Deploy to Heroku
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'  # Fixed to trigger only on main branch
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Install Heroku CLI
-      run: |
-        curl https://cli-assets.heroku.com/install.sh | sh
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
 
-    - name: Login to Heroku Container Registry
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-      run: heroku container:login
+      - name: Log in to Heroku Container Registry
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com
 
-    - name: Build and push Docker image to Heroku
-      env:
-        HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
-      run: |
-        heroku container:push web --app $HEROKU_APP_NAME
-        heroku container:release web --app $HEROKU_APP_NAME
+      - name: Build and push Docker image to Heroku
+        env:
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+        run: |
+          docker build --no-cache -t $HEROKU_APP_NAME .
+          docker tag $HEROKU_APP_NAME registry.heroku.com/$HEROKU_APP_NAME/web
+          docker push registry.heroku.com/$HEROKU_APP_NAME/web
+
+      - name: Release new Docker image
+        env:
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+        run: |
+          heroku container:release web --app $HEROKU_APP_NAME
+
+      - name: Run database migrations
+        env:
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+        run: |
+          heroku run python manage.py migrate --app $HEROKU_APP_NAME
+
+      - name: Restart Heroku dynos
+        env:
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+        run: |
+          heroku restart --app $HEROKU_APP_NAME
+
+      - name: Check logs for errors
+        env:
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+        run: |
+          heroku logs --tail --app $HEROKU_APP_NAME
