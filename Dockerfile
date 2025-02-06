@@ -10,4 +10,4 @@ COPY . /app/
 
 EXPOSE $PORT
 
-CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "config.wsgi:application"]
+CMD exec gunicorn --bind 0.0.0.0:${PORT:-8000} config.wsgi:application

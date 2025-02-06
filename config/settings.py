@@ -27,7 +27,10 @@ SECRET_KEY = "django-insecure-bve0o2$rb^&&kku$4k2e2lcuwdm8$@q$pb1u$66&(cz0p6laq$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    os.environ.get("HEROKU_APP_NAME", "localhost"),
+    ".herokuapp.com",
+]
 
 
 # Application definition
@@ -48,6 +51,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -134,6 +138,11 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+# Serve static files in production using Whitenoise
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -148,3 +157,7 @@ REST_FRAMEWORK = {
         # "rest_framework.permissions.IsAuthenticated",
     ],
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{os.environ.get('APP_NAME')}.herokuapp.com",
+]

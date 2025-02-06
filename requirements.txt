@@ -2,6 +2,7 @@ Django==4.2.4
 psycopg2==2.9.7
 djangorestframework==3.14.0
 drf_yasg==1.21.7
+whitenoise
 
 
 #test
