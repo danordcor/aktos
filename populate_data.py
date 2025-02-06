@@ -6,11 +6,14 @@ django.setup()
 
 from apps.accounts.utils import CSVProcessor
 
+
 def import_consumers_balance():
     file_path = os.path.join(os.getcwd(), "consumers_balances.csv")
 
     if not os.path.exists(file_path):
-        print("Error: The file 'consumers_balance.csv' was not found in the project root.")
+        print(
+            "Error: The file 'consumers_balance.csv' was not found in the project root."
+        )
         return
 
     try:

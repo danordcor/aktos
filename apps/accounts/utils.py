@@ -1,4 +1,3 @@
-
 import csv
 import io
 import logging
@@ -8,6 +7,7 @@ from apps.accounts.models import Account, Consumer, Client
 
 # Configure logging
 logger = logging.getLogger(__name__)
+
 
 class CSVProcessor:
     """
@@ -60,7 +60,9 @@ class CSVProcessor:
         :return: JsonResponse if invalid, None if valid.
         """
         if headers != self.EXPECTED_HEADERS:
-            logger.error(f"Invalid CSV structure. Expected headers: {self.EXPECTED_HEADERS}")
+            logger.error(
+                f"Invalid CSV structure. Expected headers: {self.EXPECTED_HEADERS}"
+            )
             return JsonResponse({"error": "Invalid CSV structure"}, status=400)
         return None
 
@@ -119,7 +121,12 @@ class CSVProcessor:
                     processed_rows += 1
 
             logger.info(f"Successfully processed {processed_rows} rows from CSV.")
-            return JsonResponse({"message": f"CSV imported successfully, {processed_rows} records added"}, status=201)
+            return JsonResponse(
+                {
+                    "message": f"CSV imported successfully, {processed_rows} records added"
+                },
+                status=201,
+            )
 
         except Exception as e:
             logger.error(f"Unexpected error processing CSV: {e}")

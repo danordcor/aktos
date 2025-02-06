@@ -77,7 +77,10 @@ class TestAccountListView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertIn("results", response.json())
         self.assertTrue(
-            all("User 1" in acc["consumers"][0]["name"] for acc in response.json()["results"])
+            all(
+                "User 1" in acc["consumers"][0]["name"]
+                for acc in response.json()["results"]
+            )
         )
 
 

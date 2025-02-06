@@ -11,10 +11,12 @@ from apps.accounts.utils import CSVProcessor
 from apps.accounts.models import Account
 from apps.accounts.serializers import AccountSerializer
 
+
 class AccountPagination(PageNumberPagination):
     page_size = 10
-    page_size_query_param = 'page_size'
+    page_size_query_param = "page_size"
     max_page_size = 100
+
 
 class AccountListView(generics.ListAPIView):
     serializer_class = AccountSerializer
@@ -43,6 +45,7 @@ class AccountListView(generics.ListAPIView):
             queryset = queryset.filter(consumers__name__icontains=consumer_name)
 
         return queryset
+
 
 class ImportCSVView(APIView):
     parser_classes = (MultiPartParser, FormParser)

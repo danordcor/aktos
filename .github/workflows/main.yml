@@ -29,4 +29,3 @@ jobs:
 
     - name: Run tests
       run: docker-compose -f docker-compose.yml run web python manage.py test
-
