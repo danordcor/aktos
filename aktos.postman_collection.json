@@ -1,0 +1,78 @@
+{
+	"info": {
+		"_postman_id": "bf4179e5-b3a3-438a-8ae8-68c129a6796e",
+		"name": "aktos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2284563"
+	},
+	"item": [
+		{
+			"name": "Get with params",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/v1/accounts?min_balance=100&max_balance=10000&status=in_collection",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"accounts"
+					],
+					"query": [
+						{
+							"key": "min_balance",
+							"value": "100"
+						},
+						{
+							"key": "max_balance",
+							"value": "10000"
+						},
+						{
+							"key": "status",
+							"value": "in_collection"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Import",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/Users/danielorozco/Downloads/consumers_balances.csv"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/accounts/import/",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"accounts",
+						"import",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
