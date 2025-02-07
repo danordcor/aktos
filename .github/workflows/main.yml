@@ -50,7 +50,7 @@ jobs:
 
     env:
       HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
-      HEROKU_API_KEY: ${{ env.HEROKU_API_KEY }}
+      HEROKU_API_KEY: aktos
 
     steps:
       - name: Checkout repository
