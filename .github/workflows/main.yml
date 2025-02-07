@@ -70,7 +70,7 @@ jobs:
 
       - name: Run collectstatic
         run: |
-          heroku run python manage.py collectstatic --noinput -a $HEROKU_APP_NAME
+          heroku run python manage.py collectstatic -a $HEROKU_APP_NAME
 
       - name: Run database migrations
         run: |
