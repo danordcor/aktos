@@ -113,10 +113,9 @@ POSTGRES_PASSWORD=dbpassword
 ---
 
 ## **🚀 Summary**
-✅ **Easy local setup using Docker Compose**  
-✅ **API endpoints for managing accounts and consumers**  
-✅ **CSV file import support**  
+✅ **Easy local setup using Docker Compose**
+✅ **API endpoints for managing accounts and consumers**
+✅ **CSV file import support**
 
-Now you're **ready to use Aktos System!** 🎉🚀  
+Now you're **ready to use Aktos System!** 🎉🚀
 If you have any issues, feel free to open a GitHub issue! 😊
-
